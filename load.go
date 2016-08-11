@@ -7,7 +7,6 @@ import (
 
 // Load loads any value from sql.Rows
 func Load(rows *sql.Rows, value interface{}) (int, error) {
-	defer rows.Close()
 
 	column, err := rows.Columns()
 	if err != nil {
@@ -66,6 +65,7 @@ func findPtr(column []string, value reflect.Value) ([]interface{}, error) {
 		var ptr []interface{}
 		m := structMap(value)
 		for _, key := range column {
+			key = camelCaseToSnakeCase(key)
 			if val, ok := m[key]; ok {
 				ptr = append(ptr, val.Addr().Interface())
 			} else {
