@@ -7,7 +7,6 @@ import (
 
 // Load loads any value from sql.Rows
 func Load(rows *sql.Rows, value interface{}) (int, error) {
-	defer rows.Close()
 
 	column, err := rows.Columns()
 	if err != nil {
