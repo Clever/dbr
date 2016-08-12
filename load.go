@@ -46,8 +46,9 @@ func Load(rows *sql.Rows, value interface{}) (int, error) {
 	return count, nil
 }
 
-// Load loads string values from sql.Rows, allowing for potentially null values.
-func LoadNullStrings(rows *sql.Rows, value interface{}) (int, error) {
+// LoadColumns loads values from sql.Rows, allowing for potentially null values.
+// note: currently only supports NullStrings.
+func LoadColumns(rows *sql.Rows, value interface{}) (int, error) {
 
 	column, err := rows.Columns()
 	if err != nil {
@@ -68,7 +69,7 @@ func LoadNullStrings(rows *sql.Rows, value interface{}) (int, error) {
 		} else {
 			elem = v
 		}
-		ptr, err := findPtrNullString(column, elem)
+		ptr, err := generateColumnArray(column, elem)
 		if err != nil {
 			return 0, err
 		}
@@ -97,7 +98,8 @@ var (
 	typeScanner             = reflect.TypeOf((*sql.Scanner)(nil)).Elem()
 )
 
-func findPtrNullString(column []string, value reflect.Value) ([]interface{}, error) {
+// currently only supports generation of a column of nullStrings.
+func generateColumnArray(column []string, value reflect.Value) ([]interface{}, error) {
 	var ptr []interface{}
 	m := structMap(value)
 	for _, key := range column {
